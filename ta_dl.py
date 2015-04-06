@@ -4,7 +4,6 @@ from sys import stdin
 import subprocess
 import time
 import requests
-import cookielib
 import zipfile
 import json
 import os
@@ -34,11 +33,11 @@ def choose_assignment(session, course_id):
 	spot = 0
 	links = []
 	for assignment in sorted(dump, key = itemgetter('id')):
-		title = assignment['name'].replace(' ', '').lower()
-		title = title.split('(')[0]
+		title = assignment['name'].lower().split('(')[0].replace(' ','')
+		title = re.sub("[^a-z0-9-.]", "-", title)
 		url = assignment['html_url']
 		links.append((title, url))
-		print '%d: %s' %(spot, title)
+		print '\t%d: %s' %(spot, title)
 		spot += 1
 	i = int(stdin.readline().strip())
 	if i >= 0 and i < spot:
@@ -62,7 +61,7 @@ def choose_course(session):
 			title = i.contents[3].find('span')['title']
 			url = ''.join(c for c in i.contents[3].find('a')['href'] if c.isdigit())
 			links.append((title, url))
-			print '%d: %s' %(spot, title)
+			print '\t%d: %s' %(spot, title)
 			spot += 1
 	i = int(stdin.readline().strip())
 	if i >= 0 and i < spot:
