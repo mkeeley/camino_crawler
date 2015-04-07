@@ -30,22 +30,21 @@ def choose_assignment(session, course_id):
 	dump = json.loads(r.content.split(';')[1])
 	dump = dump[0]['assignments']
 	
-	spot = 0
 	links = []
-	for assignment in sorted(dump, key = itemgetter('id')):
+	assignments = sorted(dump, key = itemgetter('id'))
+	for index, assignment in enumerate(assignments):
 		title = assignment['name'].lower().split('(')[0].replace(' ','')
 		title = re.sub("[^a-z0-9-.]", "-", title)
 		url = assignment['html_url']
 		links.append((title, url))
-		print '\t%d: %s' %(spot, title)
-		spot += 1
+		print '\t%d: %s' %(index, title)
 	i = int(stdin.readline().strip())
-	if i >= 0 and i < spot:
-		print 'Assignment: %s' % links[i][0]
-		# return the session (for cookies), name id, and url
-		return (session, links[i][0], links[i][1])
-	else:
-		print 'incorrect selector'
+	if i >= len(links) and i < 0:
+		print 'Selector outside range of list'
+		sys.exit(1)
+	print 'Assignment: %s' % links[i][0]
+	# return the session (for cookies), name id, and url
+	return (session, links[i][0], links[i][1])
 
 def choose_course(session):
 	r = session.get('https://camino.instructure.com/courses')
@@ -64,11 +63,11 @@ def choose_course(session):
 			print '\t%d: %s' %(spot, title)
 			spot += 1
 	i = int(stdin.readline().strip())
-	if i >= 0 and i < spot:
-		print 'Class: %s' % links[i][0]
-		return choose_assignment(session, links[i][1])
-	else:
-		print 'incorrect selector'
+	if i >= len(links) and i < 0:
+		print 'Selector outside range of list'
+		sys.exit(1)
+	print 'Class: %s' % links[i][0]
+	return choose_assignment(session, links[i][1])
 	
 # login to camino, response is camino homepage
 def login(session):
