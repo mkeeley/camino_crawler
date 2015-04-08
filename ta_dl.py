@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from sys import stdin
+from pretty import pretty
 import subprocess
 import time
 import requests
@@ -33,8 +34,7 @@ def choose_assignment(session, course_id):
 	links = []
 	assignments = sorted(dump, key = itemgetter('id'))
 	for index, assignment in enumerate(assignments):
-		title = assignment['name'].lower().split('(')[0].replace(' ','')
-		title = re.sub("[^a-z0-9-.]", "-", title)
+		title = pretty(assignment['name'])
 		url = assignment['html_url']
 		links.append((title, url))
 		print '\t%d: %s' %(index, title)
@@ -111,8 +111,7 @@ def download_submission(session, name, url):
 # rename all unzipped files, remove excess timestamps and spaces
 def rename(dir):
 	for f in os.listdir(dir):
-		tmp = re.split("[(--)|_]", f)
-		tmp = '_'.join(filter(lambda a: not (a.isdigit() or not a), tmp))
+		tmp = pretty(f)
 		tmp = os.path.join(os.getcwd(), dir, tmp)
 		f = os.path.join(os.getcwd(), dir, f)
 		os.rename(f, tmp)
