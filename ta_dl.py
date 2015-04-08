@@ -8,7 +8,6 @@ import requests
 import zipfile
 import json
 import os
-import re
 from bs4 import BeautifulSoup, SoupStrainer
 from operator import itemgetter
 
@@ -94,10 +93,12 @@ def download_submission(session, name, url):
 	with open(zip, 'wb') as z:
 		z.write(r.content)
 	f = 'file ' + zip
+	backoff = 0
 	while "archive data" not in subprocess.check_output(f, shell=True):
 		print 'Camino still packing zip file...'
+		backoff += 1
 		os.remove(zip)
-		time.sleep(1)
+		time.sleep(backoff)
 		r = session.get(url + '/submissions?zip=1')
 		with open(zip, 'wb') as z:
 			z.write(r.content)
